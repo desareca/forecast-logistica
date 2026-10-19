@@ -61,6 +61,23 @@ docker compose run --rm tests        # pytest
 docker compose run --rm lab python -m logforecast.cli quality
 docker compose run --rm lab python -m logforecast.cli train
 ```
+## Configuracion
+
+Toda la configuracion se define por variables de entorno (`src/logforecast/config.py`).
+`.env.example` documenta cada una con su valor por defecto.
+
+| Variable | Default | Docker | AWS |
+|---|---|---|---|
+| `LF_DATA_URI` | `data/raw` | `/app/data/raw` | `s3://<bucket>/raw` |
+| `LF_ARTIFACTS_URI` | `artifacts` | `/app/artifacts` | `s3://<bucket>/artifacts` |
+| `LF_MIN_HISTORY_DAYS` | `45` | idem | idem |
+| `LF_BIAS_TOLERANCE` | `0.05` | idem | idem |
+| `LF_CAPACITY_WARN_RATIO` | `0.9` | idem | idem |
+
+Los defaults de rutas son relativos a la raiz del repo. En Docker los fija
+`docker-compose.yml`; en ECS/Lambda se definen en la task definition o en
+la configuracion de la funcion. El modelo (`artifacts/model.joblib`) no se
+versiona: se genera con `python -m logforecast.cli train`.
 
 ## Modelo en produccion
 `pipeline.train()` entrena un `GatedCorrector` con el `ElasticNetCorrector` elegido por CV en
