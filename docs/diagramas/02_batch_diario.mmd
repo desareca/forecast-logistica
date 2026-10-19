@@ -1,0 +1,11 @@
+flowchart TD
+    A["Dispara EventBridge"] --> B["Chequeo de calidad de datos"]
+    B -->|falla| X["Alerta SNS<br/>se mantiene modelo vigente"]
+    B -->|ok| C["Gate por CD<br/>45 dias continuos"]
+    C --> D["Entrena solo CD en TRAIN"]
+    D --> E["Backtest de origen rodante"]
+    E --> F{"Pasa el<br/>backtest?"}
+    F -->|si| G["Guarda modelo en S3, con historia reciente<br/>y actualiza puntero en DynamoDB"]
+    F -->|no| H["Mantiene version anterior<br/>y registra el resultado"]
+    G --> I["Publica metricas y estado"]
+    H --> I

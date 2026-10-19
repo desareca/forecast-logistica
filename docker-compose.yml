@@ -1,0 +1,18 @@
+services:
+  lab:
+    build: .
+    ports:
+      - "127.0.0.1:8888:8888"   # solo accesible desde tu maquina
+    volumes:
+      - .:/app
+    environment:
+      LF_DATA_URI: /app/data/raw
+      LF_ARTIFACTS_URI: /app/artifacts
+
+  # docker compose run --rm tests
+  tests:
+    profiles: ["tools"]
+    build: .
+    volumes:
+      - .:/app
+    command: ["pytest", "-q"]

@@ -1,0 +1,8 @@
+jupyterlab>=4.1
+ipykernel>=6.29
+matplotlib>=3.8
+seaborn>=0.13
+pytest>=8.0
+ruff>=0.4
+mypy>=1.9
+pandas-stubs

@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+.ipynb_checkpoints/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+artifacts/*
+!artifacts/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+.Trash-0/

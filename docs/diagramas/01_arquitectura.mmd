@@ -1,0 +1,39 @@
+flowchart LR
+    subgraph Fuentes
+        P["Plataforma B2B<br/>pedidos, pronosticos, plan"]
+    end
+
+    subgraph Batch["Batch / re-entrenamiento"]
+        EB["EventBridge Scheduler"] --> SF["Step Functions"] --> ECS["ECS Fargate<br/>imagen en ECR"]
+    end
+
+    subgraph Persistencia
+        S3R[("S3 raw<br/>datos de entrada")]
+        S3A[("S3 artefactos<br/>modelo con historia reciente,<br/>metricas y gate")]
+        DDB[("DynamoDB<br/>version activa y gate por CD")]
+        ATH["Athena + Glue Catalog<br/>SQL sobre S3 raw y artefactos"]
+    end
+
+    subgraph Inferencia
+        LMB["Lambda de inferencia"]
+        APIGW["API Gateway"]
+    end
+
+    APP["App backend / web"]
+
+    subgraph Observabilidad
+        CW["CloudWatch<br/>logs, metricas, alarmas"] --> SNS["SNS<br/>alertas"]
+    end
+
+    P --> S3R
+    ECS -->|lee datos| S3R
+    ECS -->|escribe modelo| S3A
+    ECS -->|escribe version| DDB
+    S3A ~~~ ATH
+    DDB -->|version activa| LMB
+    S3A -->|modelo| LMB
+    S3R -->|capacidad| LMB
+    LMB <-->|request / respuesta| APIGW
+    APIGW <--> APP
+    ECS -.-> CW
+    LMB -.-> CW

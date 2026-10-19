@@ -1,0 +1,21 @@
+sequenceDiagram
+    participant App as App backend / web
+    participant GW as API Gateway
+    participant L as Lambda
+    participant D as DynamoDB
+    participant S as S3 artefactos
+    participant R as S3 raw
+
+    App->>GW: POST pronostico (CD, fechas, horizontes)
+    GW->>L: evento validado
+    L->>D: version activa del modelo
+    L->>S: carga esa version (en cache si esta caliente)
+    alt CD en TRAIN
+        L->>L: features con la historia del artefacto y pronostico corregido
+    else CD en FALLBACK, desconocido o falla del modelo
+        L->>L: devuelve el pronostico base (corregido = false)
+    end
+    L->>R: capacidad del CD y dia (en cache)
+    L->>L: uso de capacidad y alerta
+    L-->>GW: registros con unidades_corregidas, corregido y alerta
+    GW-->>App: 200
